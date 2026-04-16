@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Name</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0e0e0e;
+      --surface:  #161616;
+      --border:   #2a2a2a;
+      --text:     #f0ede8;
+      --muted:    #888580;
+      --accent:   #c8b89a;
+      --accent2:  #7a9e87;
+      --serif:    'DM Serif Display', Georgia, serif;
+      --sans:     'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.25rem 3rem;
+      border-bottom: 1px solid transparent;
+      transition: border-color .3s, background .3s;
+    }
+    nav.scrolled {
+      background: rgba(14,14,14,.92);
+      backdrop-filter: blur(12px);
+      border-color: var(--border);
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: .02em;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .85rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-grain {
+      position: absolute; inset: 0; pointer-events: none; opacity: .04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+    .hero-line {
+      position: absolute; top: 0; right: 18vw; bottom: 0;
+      width: 1px; background: var(--border); opacity: .5;
+    }
+    .hero-tag {
+      font-size: .75rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp .6s .2s forwards;
+    }
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      line-height: 1.0;
+      letter-spacing: -.02em;
+      color: var(--text);
+      max-width: 14ch;
+      opacity: 0; animation: fadeUp .7s .35s forwards;
+    }
+    .hero-name em {
+      font-style: italic; color: var(--accent);
+    }
+    .hero-bio {
+      margin-top: 2rem;
+      max-width: 42ch;
+      color: var(--muted);
+      font-size: 1rem;
+      opacity: 0; animation: fadeUp .7s .5s forwards;
+    }
+    .hero-actions {
+      margin-top: 2.5rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .7s .65s forwards;
+    }
+    .btn {
+      display: inline-block; padding: .75rem 1.75rem;
+      font-family: var(--sans); font-size: .85rem;
+      letter-spacing: .06em; text-transform: uppercase;
+      text-decoration: none; border-radius: 2px;
+      transition: all .2s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #0e0e0e; font-weight: 500;
+    }
+    .btn-primary:hover { background: #ddd0ba; }
+    .btn-ghost {
+      border: 1px solid var(--border); color: var(--muted);
+    }
+    .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 3rem;
+      display: flex; align-items: center; gap: .75rem;
+      font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0; animation: fadeUp .6s 1s forwards;
+    }
+    .scroll-hint::before {
+      content: ''; display: block; width: 32px; height: 1px; background: var(--border);
+    }
+
+    /* ── SECTIONS COMMON ── */
+    section { padding: 6rem 3rem; }
+    .section-label {
+      font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: 3rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-label::after {
+      content: ''; flex: 1; max-width: 60px; height: 1px; background: var(--border);
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1; letter-spacing: -.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── ABOUT ── */
+    #about { border-top: 1px solid var(--border); }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+      align-items: start; max-width: 900px;
+    }
+    .about-text p { color: var(--muted); margin-bottom: 1rem; }
+    .about-text p:last-child { margin-bottom: 0; }
+    .skills-block { margin-top: .5rem; }
+    .skills-block h3 {
+      font-family: var(--sans); font-weight: 500; font-size: .8rem;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .skill-tags {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+    }
+    .skill-tag {
+      padding: .35rem .9rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: .8rem; color: var(--muted);
+      transition: all .2s;
+    }
+    .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── PROJECTS ── */
+    #projects { border-top: 1px solid var(--border); }
+    .projects-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5px; background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .project-card {
+      background: var(--bg);
+      padding: 2rem;
+      transition: background .2s;
+      display: flex; flex-direction: column; gap: 1rem;
+      text-decoration: none; color: inherit;
+    }
+    .project-card:hover { background: var(--surface); }
+    .project-number {
+      font-family: var(--serif); font-size: 2.5rem;
+      color: var(--border); line-height: 1;
+    }
+    .project-title {
+      font-family: var(--serif); font-size: 1.25rem;
+      line-height: 1.2; color: var(--text);
+    }
+    .project-desc { font-size: .875rem; color: var(--muted); }
+    .project-tech {
+      margin-top: auto; display: flex; flex-wrap: wrap; gap: .4rem;
+    }
+    .project-tech span {
+      font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--accent2); border: 1px solid #2a3d30; padding: .2rem .6rem;
+      border-radius: 2px;
+    }
+    .project-arrow {
+      display: inline-block; margin-top: .5rem;
+      font-size: .8rem; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); transition: color .2s;
+    }
+    .project-card:hover .project-arrow { color: var(--accent); }
+
+    /* ── CONTACT ── */
+    #contact { border-top: 1px solid var(--border); }
+    .contact-inner { max-width: 600px; }
+    .contact-inner p { color: var(--muted); margin-bottom: 2rem; }
+    .contact-links {
+      display: flex; flex-direction: column; gap: 0;
+      border: 1px solid var(--border);
+    }
+    .contact-link {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none; color: var(--muted);
+      font-size: .875rem; transition: all .2s;
+    }
+    .contact-link:last-child { border-bottom: none; }
+    .contact-link:hover { background: var(--surface); color: var(--text); }
+    .contact-link span { font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
+    .contact-link .arrow { transition: transform .2s; }
+    .contact-link:hover .arrow { transform: translateX(4px); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .8rem; color: var(--muted);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity .6s, transform .6s;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      #hero, section { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      footer { flex-direction: column; gap: .75rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#hero" class="nav-logo">Your Name</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Work</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grain"></div>
+    <div class="hero-line"></div>
+    <p class="hero-tag">Portfolio · 2025</p>
+    <h1 class="hero-name">Your <em>Name</em> Here.</h1>
+    <p class="hero-bio">
+      A short line about who you are — what you do, what you love, what drives you.
+      Keep it to two sentences max.
+    </p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-primary">View my work</a>
+      <a href="#contact" class="btn btn-ghost">Get in touch</a>
+    </div>
+    <div class="scroll-hint">Scroll to explore</div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-label reveal">About me</p>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <h2>A little<br><em style="font-style:italic;color:var(--accent)">about</em> me.</h2>
+        <p>
+          Write 2–3 sentences about yourself here. Where are you from? What do you do or study?
+          What are you passionate about?
+        </p>
+        <p>
+          A second short paragraph works great here — something about your goals,
+          your approach, or what makes you tick.
+        </p>
+      </div>
+      <div class="skills-block reveal">
+        <h3>Things I work with</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">HTML</span>
+          <span class="skill-tag">CSS</span>
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">Your Skill</span>
+          <span class="skill-tag">Another Skill</span>
+          <span class="skill-tag">Add More</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="section-label reveal">Selected work</p>
+    <h2 class="reveal" style="margin-bottom:2.5rem">Things I've <em style="font-style:italic;color:var(--accent)">built.</em></h2>
+    <div class="projects-grid reveal">
+
+      <a href="#" class="project-card">
+        <div class="project-number">01</div>
+        <div class="project-title">Project One</div>
+        <p class="project-desc">A short description of what this project does and why it matters.</p>
+        <div class="project-tech"><span>HTML</span><span>CSS</span></div>
+        <span class="project-arrow">View project →</span>
+      </a>
+
+      <a href="#" class="project-card">
+        <div class="project-number">02</div>
+        <div class="project-title">Project Two</div>
+        <p class="project-desc">Another project — what problem did you solve? What did you learn?</p>
+        <div class="project-tech"><span>JavaScript</span><span>API</span></div>
+        <span class="project-arrow">View project →</span>
+      </a>
+
+      <a href="#" class="project-card">
+        <div class="project-number">03</div>
+        <div class="project-title">Project Three</div>
+        <p class="project-desc">Replace this with your real project. Link it to a live demo or GitHub repo.</p>
+        <div class="project-tech"><span>Your Stack</span></div>
+        <span class="project-arrow">View project →</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-label reveal">Get in touch</p>
+    <div class="contact-inner">
+      <h2 class="reveal">Let's <em style="font-style:italic;color:var(--accent)">connect.</em></h2>
+      <p class="reveal">Whether you have a project in mind, a question, or just want to say hi — my inbox is open.</p>
+      <div class="contact-links reveal">
+        <a href="mailto:you@email.com" class="contact-link">
+          <span>Email</span>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            you@email.com <span class="arrow">→</span>
+          </div>
+        </a>
+        <a href="https://github.com/yourusername" target="_blank" class="contact-link">
+          <span>GitHub</span>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            github.com/yourusername <span class="arrow">→</span>
+          </div>
+        </a>
+        <a href="https://linkedin.com/in/yourusername" target="_blank" class="contact-link">
+          <span>LinkedIn</span>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            linkedin.com/in/yourusername <span class="arrow">→</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2025 Your Name</span>
+    <span>Built with HTML & CSS</span>
+  </footer>
+
+  <script>
+    // Sticky nav
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => observer.observe(r));
+  </script>
+
+</body>
+</html>
